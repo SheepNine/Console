@@ -7,16 +7,48 @@ Uint8 R[CONTENT_SIZE * CONTENT_SIZE];
 Uint8 G[CONTENT_SIZE * CONTENT_SIZE];
 Uint8 B[CONTENT_SIZE * CONTENT_SIZE];
 
+void SetPixel(Uint8 x, Uint8 y, Uint8 r, Uint8 g, Uint8 b, SDL_bool translucent) {
+	SDL_assert(x < CONTENT_SIZE);
+	SDL_assert(x < CONTENT_SIZE);
+
+	int offset = x + y * CONTENT_SIZE;
+	if (translucent) {
+		R[offset] = (R[offset] + r) >> 1;
+		G[offset] = (G[offset] + g) >> 1;
+		B[offset] = (B[offset] + b) >> 1;
+	} else {
+		R[offset] = r;
+		G[offset] = g;
+		B[offset] = b;
+	}
+}
+
+void SetPixelPacked(Uint8 x, Uint8 y, Uint16 color) {
+	SetPixel(x, y,
+		((color & 0x7C00) >> 7), 
+		((color & 0x03E0) >> 2), 
+		((color & 0x001F) << 3), 
+		(color & 0x8000 ? SDL_TRUE : SDL_FALSE));
+}
+
+void SetPixelRoundTrip(Uint8 x, Uint8 y, Uint8 r, Uint8 g, Uint8 b, SDL_bool translucent) {
+	SetPixelPacked(x, y,
+		(translucent ? 0x8000 : 0x0000) |
+		((r & 0xF8) << 7) |
+		((g & 0xF8) << 2) |
+		((b & 0xF8) >> 3));
+}
+
 void InitBuffer() {
 	for (int y = 0; y < CONTENT_SIZE; y++)
 	{
 		for (int x = 0; x < CONTENT_SIZE; x++)
 		{
-			R[x + CONTENT_SIZE * y] = x | y;
-			G[x + CONTENT_SIZE * y] = x & y;
-			B[x + CONTENT_SIZE * y] = x ^ y;
+			SetPixelRoundTrip(x, y, x | y, x & y, x ^ y, SDL_FALSE);
 		}
+		SetPixelRoundTrip(y / 2, y, 255, 255, 255, SDL_TRUE);
 	}
+
 }
 
 Uint8 Sample(Uint8* buffer, int x, int y, int scale) {
