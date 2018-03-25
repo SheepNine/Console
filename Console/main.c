@@ -8,7 +8,7 @@ int main(int argc, char** argv) {
 	if (initResult == 0)
 	{
 		h_screen screen = create_screen();
-		InitBuffer(screen);
+		setDemo_screen(screen);
 
 		SDL_Window* window = SDL_CreateWindow(
 			"Console",

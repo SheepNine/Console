@@ -25,7 +25,7 @@ void clear_screen(h_screen screen, Uint8 r, Uint8 g, Uint8 b) {
 	SDL_memset(screen->B, b, CONTENT_SIZE * CONTENT_SIZE);
 }
 
-void SetPixel(h_screen screen, Uint8 x, Uint8 y, Uint8 r, Uint8 g, Uint8 b, SDL_bool translucent) {
+void setPixel_screen(h_screen screen, Uint8 x, Uint8 y, Uint8 r, Uint8 g, Uint8 b, SDL_bool translucent) {
 	SDL_assert(x < CONTENT_SIZE);
 	SDL_assert(x < CONTENT_SIZE);
 
@@ -42,30 +42,30 @@ void SetPixel(h_screen screen, Uint8 x, Uint8 y, Uint8 r, Uint8 g, Uint8 b, SDL_
 	}
 }
 
-void SetPixelPacked(h_screen screen, Uint8 x, Uint8 y, Uint16 color) {
-	SetPixel(screen, x, y,
+void setPixelPacked_screen(h_screen screen, Uint8 x, Uint8 y, Uint16 color) {
+	setPixel_screen(screen, x, y,
 		((color & 0x7C00) >> 7),
 		((color & 0x03E0) >> 2),
 		((color & 0x001F) << 3),
 		(color & 0x8000 ? SDL_TRUE : SDL_FALSE));
 }
 
-void SetPixelRoundTrip(h_screen screen, Uint8 x, Uint8 y, Uint8 r, Uint8 g, Uint8 b, SDL_bool translucent) {
-	SetPixelPacked(screen, x, y,
+void setPixelRoundTrip_screen(h_screen screen, Uint8 x, Uint8 y, Uint8 r, Uint8 g, Uint8 b, SDL_bool translucent) {
+	setPixelPacked_screen(screen, x, y,
 		(translucent ? 0x8000 : 0x0000) |
 		((r & 0xF8) << 7) |
 		((g & 0xF8) << 2) |
 		((b & 0xF8) >> 3));
 }
 
-void InitBuffer(h_screen screen) {
+void setDemo_screen(h_screen screen) {
 	for (int y = 0; y < CONTENT_SIZE; y++)
 	{
 		for (int x = 0; x < CONTENT_SIZE; x++)
 		{
-			SetPixelRoundTrip(screen, x, y, x | y, x & y, x ^ y, SDL_FALSE);
+			setPixelRoundTrip_screen(screen, x, y, x | y, x & y, x ^ y, SDL_FALSE);
 		}
-		SetPixelRoundTrip(screen, y / 2, y, 255, 255, 255, SDL_TRUE);
+		setPixelRoundTrip_screen(screen, y / 2, y, 255, 255, 255, SDL_TRUE);
 	}
 
 }
