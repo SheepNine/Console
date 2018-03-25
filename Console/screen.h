@@ -15,6 +15,6 @@ void setPixel_screen(h_screen screen, Uint8 x, Uint8 y, Uint8 r, Uint8 g, Uint8 
 void setPixelPacked_screen(h_screen screen, Uint8 x, Uint8 y, Uint16 color);
 void setPixelRoundTrip_screen(h_screen screen, Uint8 x, Uint8 y, Uint8 r, Uint8 g, Uint8 b, SDL_bool translucent);
 
-void Draw(h_screen screen, SDL_Window* window);
+void blt_screen(h_screen screen, Uint8 scale, Uint32 *dest, Uint32 stride);
 
 #endif
