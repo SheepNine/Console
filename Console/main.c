@@ -2,7 +2,10 @@
 #include "screen.h"
 #define SDL_WINDOW_NONE 0
 
+Uint32 frameEventCode;
+
 void Draw(h_screen screen, SDL_Window* window) {
+	Uint64 startTimer = SDL_GetPerformanceCounter();
 	SDL_Surface* surface = SDL_GetWindowSurface(window);
 
 	if (surface != NULL)
@@ -24,10 +27,31 @@ void Draw(h_screen screen, SDL_Window* window) {
 		}
 		SDL_UpdateWindowSurface(window);
 	}
+	Uint64 endTimer = SDL_GetPerformanceCounter();
+	Uint64 runtimeMs = (endTimer - startTimer) * 1000 / SDL_GetPerformanceFrequency();
+	SDL_Log("Draw: %lld ms", runtimeMs);
+}
+
+Uint32 timerCallback(Uint32 interval, void *param)
+{
+	SDL_Event event;
+	SDL_UserEvent userevent;
+
+	userevent.type = SDL_USEREVENT;
+	userevent.code = frameEventCode;
+	userevent.data1 = NULL;
+	userevent.data2 = NULL;
+
+	event.type = SDL_USEREVENT;
+	event.user = userevent;
+
+	SDL_PushEvent(&event);
+
+	return interval;
 }
 
 int main(int argc, char** argv) {
-	int initResult = SDL_Init(SDL_INIT_VIDEO);
+	int initResult = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
 
 	if (initResult == 0)
 	{
@@ -43,32 +67,46 @@ int main(int argc, char** argv) {
 		if (window != NULL)
 		{
 			SDL_SetWindowMinimumSize(window, CONTENT_SIZE, CONTENT_SIZE);
-			Draw(screen, window);
+			//Draw(screen, window);
 
-			SDL_bool done = SDL_FALSE;
-			while (!done)
+			frameEventCode = SDL_RegisterEvents(1);
+			if (frameEventCode != (Uint32)-1)
 			{
-				SDL_Event evt;
-				if (SDL_WaitEvent(&evt)) {
-					switch (evt.type)
-					{
-					case SDL_WINDOWEVENT:
-						if (evt.window.event == SDL_WINDOWEVENT_CLOSE) {
-							done = SDL_TRUE;
-						}
-						if (evt.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
-							Draw(screen, window);
-						}
-						if (evt.window.event == SDL_WINDOWEVENT_EXPOSED) {
-							Draw(screen, window);
-						}
-						break;
-					}
-				} else {
-					done = true;
-				}
-			}
+				SDL_TimerID timerId = SDL_AddTimer(42, timerCallback, NULL);
 
+				if (timerId != 0) {
+					SDL_bool done = SDL_FALSE;
+					Uint8 frameCounter = 0;
+					while (!done)
+					{
+						SDL_Event evt;
+						if (SDL_WaitEvent(&evt)) {
+							switch (evt.type)
+							{
+							case SDL_WINDOWEVENT:
+								if (evt.window.event == SDL_WINDOWEVENT_CLOSE) {
+									done = SDL_TRUE;
+								}
+								/*if (evt.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+									Draw(screen, window);
+								}
+								if (evt.window.event == SDL_WINDOWEVENT_EXPOSED) {
+									Draw(screen, window);
+								}*/
+								break;
+							case SDL_USEREVENT:
+								if (evt.user.code == frameEventCode) {
+									Draw(screen, window);
+								}
+							}
+						}
+						else {
+							done = true;
+						}
+					}
+				}
+				SDL_RemoveTimer(timerId);
+			}
 			SDL_DestroyWindow(window);
 		}
 
