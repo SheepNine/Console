@@ -82,3 +82,31 @@ void blt_screen(h_screen screen, Uint8 scale, Uint32 *dest, Uint32 stride) {
 		}
 	}
 }
+
+void drawGlyph_screen(h_screen screen, Uint8 targetX, Uint8 targetY, Uint8* bitPlanes, Uint16* palette) {
+	for (int y = 0; y < 8; y++) {
+		if (targetY >= CONTENT_SIZE - y) {
+			continue;
+		}
+		Uint16 plane0 = ((Uint16)bitPlanes[y +  0]) << 0;
+		Uint16 plane1 = ((Uint16)bitPlanes[y +  8]) << 1;
+		Uint16 plane2 = ((Uint16)bitPlanes[y + 16]) << 2;
+		Uint16 plane3 = ((Uint16)bitPlanes[y + 24]) << 3;
+		for (int x = 0; x < 8; x++) {
+			if (targetX >= CONTENT_SIZE - x) {
+				continue;
+			}
+
+			Uint8 offset = 7 - x;
+			Uint16 mask = 1 << offset;
+
+			Uint16 paletteIndex =
+				((plane0 & (mask << 0)) >> (offset)) |
+				((plane1 & (mask << 1)) >> (offset)) |
+				((plane2 & (mask << 2)) >> (offset)) |
+				((plane3 & (mask << 3)) >> (offset));
+
+			setPixelPacked_screen(screen, x + targetX, y + targetY, palette[paletteIndex]);
+		}
+	}
+}
