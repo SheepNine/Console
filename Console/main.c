@@ -3,6 +3,7 @@
 #define SDL_WINDOW_NONE 0
 
 Uint32 frameEventCode;
+SDL_atomic_t timerQueue;
 
 void Draw(h_screen screen, SDL_Window* window) {
 	Uint64 startTimer = SDL_GetPerformanceCounter();
@@ -62,6 +63,7 @@ Uint32 timerCallback(Uint32 interval, void *param)
 	event.type = SDL_USEREVENT;
 	event.user = userevent;
 
+	SDL_AtomicIncRef(&timerQueue);
 	SDL_PushEvent(&event);
 
 	return interval;
@@ -113,7 +115,12 @@ int main(int argc, char** argv) {
 								break;
 							case SDL_USEREVENT:
 								if (evt.user.code == frameEventCode) {
-									Draw(screen, window);
+									SDL_bool doDraw = SDL_AtomicDecRef(&timerQueue);
+									if (doDraw) {
+										Draw(screen, window);
+									} else {
+										SDL_Log("Frame skipped!");
+									}
 								}
 							}
 						}
