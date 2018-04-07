@@ -36,8 +36,12 @@ void Draw(h_screen screen, SDL_Window* window) {
 				};
 				clear_screen(screen, 0, 0, 0);
 
-				drawGlyph_screen(screen, 128, 120, glyphBitPlanes, palette);
-				drawGlyph_screen(screen, 241, 245, glyphBitPlanes, palette);
+				drawGlyph_screen(screen, 1, 1, glyphBitPlanes, palette, SDL_FALSE, SDL_FALSE);
+				drawGlyph_screen(screen, 9, 1, glyphBitPlanes, palette, SDL_TRUE, SDL_FALSE);
+				drawGlyph_screen(screen, 1, 9, glyphBitPlanes, palette, SDL_FALSE, SDL_TRUE);
+				drawGlyph_screen(screen, 9, 9, glyphBitPlanes, palette, SDL_TRUE, SDL_TRUE);
+
+				drawGlyph_screen(screen, 241, 245, glyphBitPlanes, palette, SDL_FALSE, SDL_FALSE);
 
 				blt_screen(screen, scale, &((Uint32*)surface->pixels)[contentOffset], surface->w);
 			}

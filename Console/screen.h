@@ -17,6 +17,6 @@ void setPixelRoundTrip_screen(h_screen screen, Uint8 x, Uint8 y, Uint8 r, Uint8 
 
 void blt_screen(h_screen screen, Uint8 scale, Uint32 *dest, Uint32 stride);
 
-void drawGlyph_screen(h_screen screen, Uint8 targetX, Uint8 targetY, Uint8* bitPlanes, Uint16* palette);
+void drawGlyph_screen(h_screen screen, Uint8 targetX, Uint8 targetY, Uint8* bitPlanes, Uint16* palette, SDL_bool hFlip, SDL_bool vFlip);
 
 #endif
