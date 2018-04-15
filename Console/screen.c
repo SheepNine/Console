@@ -83,7 +83,7 @@ void blt_screen(h_screen screen, Uint8 scale, Uint32 *dest, Uint32 stride) {
 	}
 }
 
-void drawGlyph_screen(h_screen screen, Uint8 targetX, Uint8 targetY, Uint8* bitPlanes, Uint16* palette, SDL_bool hFlip, SDL_bool vFlip) {
+void drawGlyph_screen(h_screen screen, Uint8 targetX, Uint8 targetY, Uint8* bitPlanes, Uint16* palette, SDL_bool hFlip, SDL_bool vFlip, SDL_bool drawIndexZero) {
 	for (int y = 0; y < 8; y++) {
 		if (targetY >= CONTENT_SIZE - y) {
 			continue;
@@ -107,7 +107,9 @@ void drawGlyph_screen(h_screen screen, Uint8 targetX, Uint8 targetY, Uint8* bitP
 				((plane2 & (mask << 2)) >> (xOffset)) |
 				((plane3 & (mask << 3)) >> (xOffset));
 
-			setPixelPacked_screen(screen, x + targetX, y + targetY, palette[paletteIndex]);
+			if (paletteIndex != 0 || drawIndexZero) {
+				setPixelPacked_screen(screen, x + targetX, y + targetY, palette[paletteIndex]);
+			}
 		}
 	}
 }

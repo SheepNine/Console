@@ -51,14 +51,14 @@ void Draw(h_screen screen, SDL_Window* window) {
 				int contentOffsetY = (surface->h - CONTENT_SIZE * scale) / 2;
 				int contentOffset = (contentOffsetX + surface->w * contentOffsetY);
 
-				clear_screen(screen, 0, 0, 0);
+				clear_screen(screen, 0, 0xAA, 0xAA);
 
 				for (int x = 0; x < 31; x++) {
 					for (int y = 0; y < 31; y++) {
 						drawGlyph_screen(screen, 8 * x, 8 * y,
 							&brickGlyphPlanes[(x % 2) * 32 + (y % 2) * 64],
 							&brickPalette[((y/2) % 2) * 16],
-							SDL_FALSE, SDL_FALSE);
+							SDL_FALSE, SDL_FALSE, SDL_FALSE);
 					}
 				}
 
@@ -75,10 +75,10 @@ void Draw(h_screen screen, SDL_Window* window) {
 					0x0000, 0x7FFF, 0x7C00, 0x001F,
 				};
 
-				drawGlyph_screen(screen, 1, 1, &glyphs_rando[0], palette_vga, SDL_FALSE, SDL_FALSE);
-				drawGlyph_screen(screen, 1, 9, &glyphs_rando[256], palette_vga, SDL_FALSE, SDL_FALSE);
-				drawGlyph_screen(screen, 9, 1, &glyphs_rando[32], palette_vga, SDL_FALSE, SDL_FALSE);
-				drawGlyph_screen(screen, 9, 9, &glyphs_rando[288], palette_vga, SDL_FALSE, SDL_FALSE);
+				drawGlyph_screen(screen, 1, 1, &glyphs_rando[0], palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE);
+				drawGlyph_screen(screen, 1, 9, &glyphs_rando[256], palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE);
+				drawGlyph_screen(screen, 9, 1, &glyphs_rando[32], palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE);
+				drawGlyph_screen(screen, 9, 9, &glyphs_rando[288], palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE);
 
 				blt_screen(screen, scale, &((Uint32*)surface->pixels)[contentOffset], surface->w);
 			}
