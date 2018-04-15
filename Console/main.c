@@ -75,10 +75,10 @@ void Draw(h_screen screen, SDL_Window* window) {
 					0x0000, 0x7FFF, 0x7C00, 0x001F,
 				};
 
-				drawGlyph_screen(screen, 1, 1, &glyphs_rando[0], palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE);
-				drawGlyph_screen(screen, 1, 9, &glyphs_rando[256], palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE);
-				drawGlyph_screen(screen, 9, 1, &glyphs_rando[32], palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE);
-				drawGlyph_screen(screen, 9, 9, &glyphs_rando[288], palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE);
+				drawSprite_screen(screen, 0, 0, 2, 2, glyphs_rando, 11, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE);
+				drawSprite_screen(screen, 17, 0, 2, 2, glyphs_rando, 11, palette_vga, SDL_TRUE, SDL_FALSE, SDL_TRUE);
+				drawSprite_screen(screen, 0, 17, 2, 2, glyphs_rando, 255, palette_vga, SDL_FALSE, SDL_TRUE, SDL_TRUE);
+				drawSprite_screen(screen, 17, 17, 2, 2, glyphs_rando, 255, palette_vga, SDL_TRUE, SDL_TRUE, SDL_FALSE);
 
 				blt_screen(screen, scale, &((Uint32*)surface->pixels)[contentOffset], surface->w);
 			}

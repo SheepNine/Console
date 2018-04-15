@@ -113,3 +113,26 @@ void drawGlyph_screen(h_screen screen, Uint8 targetX, Uint8 targetY, Uint8* bitP
 		}
 	}
 }
+
+void drawSprite_screen(h_screen screen, Sint16 targetX, Sint16 targetY, Uint8 sizeX, Uint8 sizeY, Uint8* glyphPage, Uint8 firstGlyphIndex, Uint16* palette, SDL_bool hFlip, SDL_bool vFlip, SDL_bool drawIndexZero) {
+	int shiftX = 8;
+	if (hFlip) {
+		shiftX = -8;
+		targetX += 8 * (sizeX - 1);
+	}
+	int shiftY = 8;
+	if (vFlip) {
+		shiftY = -8;
+		targetY += 8 * (sizeY - 1);
+	}
+
+	for (int y = 0; y < sizeY; y++) {
+		int glyphRow = ((firstGlyphIndex >> 3) + y) % 0x20;
+		for (int x = 0; x < sizeX; x++) {
+			int glyphCol = ((firstGlyphIndex & 0x7) + x) % 0x8;
+			int glyphIndex = (glyphRow << 3) | glyphCol;
+
+			drawGlyph_screen(screen, targetX + shiftX * x, targetY + shiftY * y, &glyphPage[32 * glyphIndex], palette, hFlip, vFlip, drawIndexZero);
+		}
+	}
+}
