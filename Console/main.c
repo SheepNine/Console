@@ -1,5 +1,6 @@
 #include "SDL.h"
 #include "screen.h"
+#include "resources.h"
 #define SDL_WINDOW_NONE 0
 
 Uint8 brickGlyphPlanes[128] = {
@@ -74,10 +75,10 @@ void Draw(h_screen screen, SDL_Window* window) {
 					0x0000, 0x7FFF, 0x7C00, 0x001F,
 				};
 
-				drawGlyph_screen(screen, 1, 1, glyphBitPlanes, palette, SDL_FALSE, SDL_FALSE);
-				drawGlyph_screen(screen, 1, 9, glyphBitPlanes, palette, SDL_FALSE, SDL_TRUE);
-				drawGlyph_screen(screen, 9, 1, glyphBitPlanes, palette, SDL_TRUE, SDL_FALSE);
-				drawGlyph_screen(screen, 9, 9, glyphBitPlanes, palette, SDL_TRUE, SDL_TRUE);
+				drawGlyph_screen(screen, 1, 1, &glyphs_rando[0], palette_vga, SDL_FALSE, SDL_FALSE);
+				drawGlyph_screen(screen, 1, 9, &glyphs_rando[256], palette_vga, SDL_FALSE, SDL_FALSE);
+				drawGlyph_screen(screen, 9, 1, &glyphs_rando[32], palette_vga, SDL_FALSE, SDL_FALSE);
+				drawGlyph_screen(screen, 9, 9, &glyphs_rando[288], palette_vga, SDL_FALSE, SDL_FALSE);
 
 				blt_screen(screen, scale, &((Uint32*)surface->pixels)[contentOffset], surface->w);
 			}
