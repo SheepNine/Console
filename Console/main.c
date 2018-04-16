@@ -163,6 +163,12 @@ int main(int argc, char** argv) {
 										SDL_Log("Frame skipped!");
 									}
 								}
+								break;
+							case SDL_KEYDOWN:
+								if (evt.key.keysym.scancode == SDL_SCANCODE_F1) {
+									toggleCrtMode_screen(screen);
+								}
+								break;
 							}
 						}
 						else {

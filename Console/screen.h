@@ -7,6 +7,8 @@ typedef struct screen_def *h_screen;
 h_screen create_screen();
 void destroy_screen(h_screen screen);
 
+void toggleCrtMode_screen(h_screen screen);
+
 void clear_screen(h_screen screen, Uint8 r, Uint8 g, Uint8 b);
 
 void setDemo_screen(h_screen screen);
