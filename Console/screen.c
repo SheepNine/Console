@@ -1,5 +1,6 @@
 #include "screen.h"
 #define CONTENT_SIZE 248
+#define int dont_use_int
 
 typedef struct screen_def screen, *h_screen;
 
@@ -39,7 +40,7 @@ void setPixel_screen(h_screen screen, Uint8 x, Uint8 y, Uint8 r, Uint8 g, Uint8 
 	SDL_assert(x < CONTENT_SIZE);
 	SDL_assert(x < CONTENT_SIZE);
 
-	int offset = x + y * CONTENT_SIZE;
+	Uint16 offset = x + y * CONTENT_SIZE;
 	if (translucent) {
 		screen->R[offset] = (screen->R[offset] + r) >> 1;
 		screen->G[offset] = (screen->G[offset] + g) >> 1;
@@ -69,9 +70,9 @@ void setPixelRoundTrip_screen(h_screen screen, Uint8 x, Uint8 y, Uint8 r, Uint8 
 }
 
 void setDemo_screen(h_screen screen) {
-	for (int y = 0; y < CONTENT_SIZE; y++)
+	for (Uint8 y = 0; y < CONTENT_SIZE; y++)
 	{
-		for (int x = 0; x < CONTENT_SIZE; x++)
+		for (Uint8 x = 0; x < CONTENT_SIZE; x++)
 		{
 			setPixelRoundTrip_screen(screen, x, y, x | y, x & y, x ^ y, SDL_FALSE);
 		}
@@ -85,7 +86,7 @@ Uint32 packColor(Uint8 r, Uint8 g, Uint8 b) {
 }
 
 void scanPixelCrt_screen(h_screen screen, Uint8 x, Uint8 y, Uint8 scale, Uint32* dest, Uint32 stride) {
-	int srcOffset = x + y * CONTENT_SIZE;
+	Uint16 srcOffset = x + y * CONTENT_SIZE;
 	Uint8 prevR = (x == 0) ? 0 : screen->R[srcOffset - 1];
 	Uint8 prevG = (x == 0) ? 0 : screen->G[srcOffset - 1];
 	Uint8 prevB = (x == 0) ? 0 : screen->B[srcOffset - 1];
@@ -113,8 +114,8 @@ void scanPixelCrt_screen(h_screen screen, Uint8 x, Uint8 y, Uint8 scale, Uint32*
 		nextR = (nextR + currR + currR) / 3;
 		nextG = (nextG + currG + currG) / 3;
 		nextB = (nextB + currB + currB) / 3;
-		for (int v = 0; v < scale; v++) {
-			int shift = (v == 2) ? 1 : 0;
+		for (Uint8 v = 0; v < scale; v++) {
+			Uint8 shift = (v == 2) ? 1 : 0;
 			dest[0 + stride * v] = packColor(prevR >> shift, prevG >> shift, prevB >> shift);
 			dest[1 + stride * v] = packColor(currR >> shift, currG >> shift, currB >> shift);
 			dest[2 + stride * v] = packColor(nextR >> shift, nextG >> shift, nextB >> shift);
@@ -127,8 +128,8 @@ void scanPixelCrt_screen(h_screen screen, Uint8 x, Uint8 y, Uint8 scale, Uint32*
 		nextR = (nextR + currR + currR) / 3;
 		nextG = (nextG + currG + currG) / 3;
 		nextB = (nextB + currB + currB) / 3;
-		for (int v = 0; v < scale; v++) {
-			int shift = (v == 0 || v == 3) ? 1 : 0;
+		for (Uint8 v = 0; v < scale; v++) {
+			Uint8 shift = (v == 0 || v == 3) ? 1 : 0;
 			dest[0 + stride * v] = packColor(prevR >> shift, prevG >> shift, prevB >> shift);
 			dest[1 + stride * v] = packColor(currR >> shift, currG >> shift, currB >> shift);
 			dest[2 + stride * v] = packColor(currR >> shift, currG >> shift, currB >> shift);
@@ -142,15 +143,15 @@ void scanPixelCrt_screen(h_screen screen, Uint8 x, Uint8 y, Uint8 scale, Uint32*
 		nextR = (nextR + currR + currR) / 3;
 		nextG = (nextG + currG + currG) / 3;
 		nextB = (nextB + currB + currB) / 3;
-		for (int v = 0; v < scale - 1; v++) {
-			int shift = (v == 0 || v == 3) ? 1 : 0;
+		for (Uint8 v = 0; v < scale - 1; v++) {
+			Uint8 shift = (v == 0 || v == 3) ? 1 : 0;
 			dest[0 + stride * v] = packColor(prevR >> shift, prevG >> shift, prevB >> shift);
 			dest[1 + stride * v] = packColor(currR >> shift, currG >> shift, currB >> shift);
 			dest[2 + stride * v] = packColor(currR >> shift, currG >> shift, currB >> shift);
 			dest[3 + stride * v] = packColor(currR >> shift, currG >> shift, currB >> shift);
 			dest[4 + stride * v] = packColor(nextR >> shift, nextG >> shift, nextB >> shift);
 		}
-		for (int u = 0; u < scale; u++) {
+		for (Uint8 u = 0; u < scale; u++) {
 			dest[u + stride * 4] = 0;
 		}
 		break;
@@ -158,19 +159,19 @@ void scanPixelCrt_screen(h_screen screen, Uint8 x, Uint8 y, Uint8 scale, Uint32*
 }
 
 void scanPixelLcd_screen(h_screen screen, Uint8 x, Uint8 y, Uint8 scale, Uint32* dest, Uint32 stride) {
-	int srcOffset = x + y * CONTENT_SIZE;
+	Uint16 srcOffset = x + y * CONTENT_SIZE;
 	Uint8 currR = screen->R[srcOffset];
 	Uint8 currG = screen->G[srcOffset];
 	Uint8 currB = screen->B[srcOffset];
-	for (int v = 0; v < scale; v++) {
-		for (int u = 0; u < scale; u++) {
+	for (Uint8 v = 0; v < scale; v++) {
+		for (Uint8 u = 0; u < scale; u++) {
 			dest[u + stride * v] = packColor(currR, currG, currB);
 		}
 	}
 }
 
 void scanline_screen(h_screen screen, Uint8 y, Uint8 scale, Uint32* dest, Uint32 stride) {
-	for (int x = 0; x < CONTENT_SIZE; x++) {
+	for (Uint8 x = 0; x < CONTENT_SIZE; x++) {
 		if (screen->crtMode) {
 			scanPixelCrt_screen(screen, x, y, scale, &dest[scale * x], stride);
 		} else {
@@ -180,14 +181,21 @@ void scanline_screen(h_screen screen, Uint8 y, Uint8 scale, Uint32* dest, Uint32
 }
 
 void blt_screen(h_screen screen, Uint8 scale, Uint32 *dest, Uint32 stride) {
-	for (int y = 0; y < CONTENT_SIZE; y++) {
+	for (Uint8 y = 0; y < CONTENT_SIZE; y++) {
 		scanline_screen(screen, y, scale, &dest[stride * scale * y], stride);
 	}
 }
 
-void drawGlyph_screen(h_screen screen, Uint8 targetX, Uint8 targetY, Uint8* bitPlanes, Uint16* palette, SDL_bool hFlip, SDL_bool vFlip, SDL_bool drawIndexZero) {
-	for (int y = 0; y < 8; y++) {
-		if (targetY >= CONTENT_SIZE - y) {
+void drawGlyph_screen(h_screen screen, Sint16 targetX, Sint16 targetY, Uint8* bitPlanes, Uint16* palette, SDL_bool hFlip, SDL_bool vFlip, SDL_bool drawIndexZero) {
+	if (targetX >= CONTENT_SIZE || targetX <= -8) {
+		return;
+	}
+	if (targetY >= CONTENT_SIZE || targetY <= -8) {
+		return;
+	}
+
+	for (Uint8 y = 0; y < 8; y++) {
+		if (targetY >= CONTENT_SIZE - y || targetY + y < 0) {
 			continue;
 		}
 		Uint8 yOffset = vFlip ? 7 - y : y;
@@ -195,8 +203,8 @@ void drawGlyph_screen(h_screen screen, Uint8 targetX, Uint8 targetY, Uint8* bitP
 		Uint16 plane1 = ((Uint16)bitPlanes[yOffset +  8]) << 1;
 		Uint16 plane2 = ((Uint16)bitPlanes[yOffset + 16]) << 2;
 		Uint16 plane3 = ((Uint16)bitPlanes[yOffset + 24]) << 3;
-		for (int x = 0; x < 8; x++) {
-			if (targetX >= CONTENT_SIZE - x) {
+		for (Uint8 x = 0; x < 8; x++) {
+			if (targetX >= CONTENT_SIZE - x || targetX + x < 0) {
 				continue;
 			}
 
@@ -217,22 +225,29 @@ void drawGlyph_screen(h_screen screen, Uint8 targetX, Uint8 targetY, Uint8* bitP
 }
 
 void drawSprite_screen(h_screen screen, Sint16 targetX, Sint16 targetY, Uint8 sizeX, Uint8 sizeY, Uint8* glyphPage, Uint8 firstGlyphIndex, Uint16* palette, SDL_bool hFlip, SDL_bool vFlip, SDL_bool drawIndexZero) {
-	int shiftX = 8;
+	if (targetX >= CONTENT_SIZE || targetX + 8 * sizeX <= 0) {
+		return;
+	}
+	if (targetY >= CONTENT_SIZE || targetY + 8 * sizeY <= 0) {
+		return;
+	}
+
+	Sint8 shiftX = 8;
 	if (hFlip) {
 		shiftX = -8;
 		targetX += 8 * (sizeX - 1);
 	}
-	int shiftY = 8;
+	Sint8 shiftY = 8;
 	if (vFlip) {
 		shiftY = -8;
 		targetY += 8 * (sizeY - 1);
 	}
 
-	for (int y = 0; y < sizeY; y++) {
-		int glyphRow = ((firstGlyphIndex >> 3) + y) % 0x20;
-		for (int x = 0; x < sizeX; x++) {
-			int glyphCol = ((firstGlyphIndex & 0x7) + x) % 0x8;
-			int glyphIndex = (glyphRow << 3) | glyphCol;
+	for (Uint8 y = 0; y < sizeY; y++) {
+		Uint8 glyphRow = (firstGlyphIndex + (y << 3)) & 0xF8;
+		for (Uint8 x = 0; x < sizeX; x++) {
+			Uint8 glyphCol = (firstGlyphIndex + x) & 0x07;
+			Uint8 glyphIndex = glyphRow | glyphCol;
 
 			drawGlyph_screen(screen, targetX + shiftX * x, targetY + shiftY * y, &glyphPage[32 * glyphIndex], palette, hFlip, vFlip, drawIndexZero);
 		}
