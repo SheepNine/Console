@@ -142,10 +142,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
+    <ClCompile Include="ppu.c" />
     <ClCompile Include="resources.c" />
     <ClCompile Include="screen.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ppu.h" />
     <ClInclude Include="resources.h" />
     <ClInclude Include="screen.h" />
   </ItemGroup>
