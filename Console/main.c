@@ -1,6 +1,7 @@
 #include "SDL.h"
 #include "screen.h"
 #include "ppu.h"
+#include "resources.h"
 #define SDL_WINDOW_NONE 0
 
 Uint32 frameEventCode;
@@ -24,6 +25,18 @@ void Draw(h_screen screen, SDL_Window* window) {
 				int contentOffset = (contentOffsetX + surface->w * contentOffsetY);
 
 				h_ppu ppu = create_ppu();
+
+				setLayerControl_ppu(ppu, 0, SDL_TRUE, SDL_FALSE, 0, 3);
+				setBackgroundPage_ppu(ppu, 0, glyphs_rando);
+				setBackgroundPalette_ppu(ppu, 0, palette_vga);
+				setLayerClip_ppu(ppu, 0, 6, SDL_FALSE, 4, SDL_FALSE);
+
+				for (int y = 0; y < 32; y++) {
+					for (int x = 0; x < 32; x++) {
+						setBackgroundTile_ppu(ppu, 0, x, y, 0, (1 + (x % 2) + 2 * (y % 2)), SDL_FALSE, SDL_FALSE, 0, SDL_FALSE);
+					}
+				}
+
 				render_ppu(ppu, screen);
 				destroy_ppu(ppu);
 

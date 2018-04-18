@@ -29,7 +29,7 @@ void setLayerClip_ppu(h_ppu ppu, Uint8 layerIndex,
 	Uint8 hClipY, SDL_bool clipBelow,
 	Uint8 vClipX, SDL_bool clipRight);
 
-void setLayerControl_ppu(h_ppu, Uint8 layerIndex,
+void setLayerControl_ppu(h_ppu ppu, Uint8 layerIndex,
 	SDL_bool enabled, SDL_bool drawSpritesFirst,
 	Uint8 xOffset, Uint8 yOffset);
 
