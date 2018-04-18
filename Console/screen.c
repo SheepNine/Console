@@ -186,7 +186,7 @@ void blt_screen(h_screen screen, Uint8 scale, Uint32 *dest, Uint32 stride) {
 	}
 }
 
-void drawGlyph_screen(h_screen screen, Sint16 targetX, Sint16 targetY, Uint8* bitPlanes, Uint16* palette, SDL_bool hFlip, SDL_bool vFlip, SDL_bool drawIndexZero) {
+void drawGlyph_screen(h_screen screen, Sint16 targetX, Sint16 targetY, Uint8* bitPlanes, Uint16* palette, SDL_bool hFlip, SDL_bool vFlip, SDL_bool drawIndexZero, Uint8 hClip, Uint8 vClip) {
 	if (targetX >= CONTENT_SIZE || targetX <= -8) {
 		return;
 	}
@@ -194,8 +194,16 @@ void drawGlyph_screen(h_screen screen, Sint16 targetX, Sint16 targetY, Uint8* bi
 		return;
 	}
 
+	SDL_bool clipBelow = (hClip & 0x80) != 0;
+	hClip <<= 1;
+	SDL_bool clipRight = (vClip & 0x80) != 0;
+	vClip <<= 1;
+
 	for (Uint8 y = 0; y < 8; y++) {
 		if (targetY >= CONTENT_SIZE - y || targetY + y < 0) {
+			continue;
+		}
+		if (clipBelow && targetY + y >= hClip || !clipBelow && targetY + y < hClip) {
 			continue;
 		}
 		Uint8 yOffset = vFlip ? 7 - y : y;
@@ -205,6 +213,9 @@ void drawGlyph_screen(h_screen screen, Sint16 targetX, Sint16 targetY, Uint8* bi
 		Uint16 plane3 = ((Uint16)bitPlanes[yOffset + 24]) << 3;
 		for (Uint8 x = 0; x < 8; x++) {
 			if (targetX >= CONTENT_SIZE - x || targetX + x < 0) {
+				continue;
+			}
+			if (clipRight && targetX + x >= vClip || !clipRight && targetX + x < vClip) {
 				continue;
 			}
 
@@ -224,7 +235,7 @@ void drawGlyph_screen(h_screen screen, Sint16 targetX, Sint16 targetY, Uint8* bi
 	}
 }
 
-void drawSprite_screen(h_screen screen, Sint16 targetX, Sint16 targetY, Uint8 sizeX, Uint8 sizeY, Uint8* glyphPage, Uint8 firstGlyphIndex, Uint16* palette, SDL_bool hFlip, SDL_bool vFlip, SDL_bool drawIndexZero) {
+void drawSprite_screen(h_screen screen, Sint16 targetX, Sint16 targetY, Uint8 sizeX, Uint8 sizeY, Uint8* glyphPage, Uint8 firstGlyphIndex, Uint16* palette, SDL_bool hFlip, SDL_bool vFlip, SDL_bool drawIndexZero, Uint8 hClip, Uint8 vClip) {
 	if (targetX >= CONTENT_SIZE || targetX + 8 * sizeX <= 0) {
 		return;
 	}
@@ -249,7 +260,7 @@ void drawSprite_screen(h_screen screen, Sint16 targetX, Sint16 targetY, Uint8 si
 			Uint8 glyphCol = (firstGlyphIndex + x) & 0x07;
 			Uint8 glyphIndex = glyphRow | glyphCol;
 
-			drawGlyph_screen(screen, targetX + shiftX * x, targetY + shiftY * y, &glyphPage[32 * glyphIndex], palette, hFlip, vFlip, drawIndexZero);
+			drawGlyph_screen(screen, targetX + shiftX * x, targetY + shiftY * y, &glyphPage[32 * glyphIndex], palette, hFlip, vFlip, drawIndexZero, hClip, vClip);
 		}
 	}
 }

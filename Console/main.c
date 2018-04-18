@@ -58,7 +58,7 @@ void Draw(h_screen screen, SDL_Window* window) {
 						drawGlyph_screen(screen, 8 * x, 8 * y,
 							&brickGlyphPlanes[(x % 2) * 32 + (y % 2) * 64],
 							&brickPalette[((y/2) % 2) * 16],
-							SDL_FALSE, SDL_FALSE, SDL_FALSE);
+							SDL_FALSE, SDL_FALSE, SDL_FALSE, 0xF0, 0x0F);
 					}
 				}
 
@@ -75,26 +75,26 @@ void Draw(h_screen screen, SDL_Window* window) {
 					0x0000, 0x7FFF, 0x7C00, 0x001F,
 				};
 
-				drawSprite_screen(screen, 0, 0, 2, 2, glyphs_rando, 11, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE);
-				drawSprite_screen(screen, 17, 0, 2, 2, glyphs_rando, 11, palette_vga, SDL_TRUE, SDL_FALSE, SDL_TRUE);
-				drawSprite_screen(screen, 0, 17, 2, 2, glyphs_rando, 255, palette_vga, SDL_FALSE, SDL_TRUE, SDL_TRUE);
-				drawSprite_screen(screen, 17, 17, 2, 2, glyphs_rando, 255, palette_vga, SDL_TRUE, SDL_TRUE, SDL_FALSE);
+				drawSprite_screen(screen, 0, 0, 2, 2, glyphs_rando, 11, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE, 0, 0);
+				drawSprite_screen(screen, 17, 0, 2, 2, glyphs_rando, 11, palette_vga, SDL_TRUE, SDL_FALSE, SDL_TRUE, 0, 0);
+				drawSprite_screen(screen, 0, 17, 2, 2, glyphs_rando, 255, palette_vga, SDL_FALSE, SDL_TRUE, SDL_TRUE, 0, 0);
+				drawSprite_screen(screen, 17, 17, 2, 2, glyphs_rando, 255, palette_vga, SDL_TRUE, SDL_TRUE, SDL_FALSE, 0, 0);
 				
-				drawSprite_screen(screen, 0,      0,      2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE);
-				drawSprite_screen(screen, 0 - 15, 0,      2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE);
-				drawSprite_screen(screen, 0,      0 - 15, 2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE);
+				drawSprite_screen(screen, 0,      0,      2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE, 0, 0);
+				drawSprite_screen(screen, 0 - 15, 0,      2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE, 0, 0);
+				drawSprite_screen(screen, 0,      0 - 15, 2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE, 0, 0);
 				
-				drawSprite_screen(screen, 232,      0,      2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE);
-				drawSprite_screen(screen, 232 + 15, 0,      2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE);
-				drawSprite_screen(screen, 232,      0 - 15, 2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE);
+				drawSprite_screen(screen, 232,      0,      2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE, 0, 0);
+				drawSprite_screen(screen, 232 + 15, 0,      2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE, 0, 0);
+				drawSprite_screen(screen, 232,      0 - 15, 2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE, 0, 0);
 				
-				drawSprite_screen(screen, 0,      232,      2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE);
-				drawSprite_screen(screen, 0 - 15, 232,      2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE);
-				drawSprite_screen(screen, 0,      232 + 15, 2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE);				
+				drawSprite_screen(screen, 0,      232,      2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE, 0, 0);
+				drawSprite_screen(screen, 0 - 15, 232,      2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE, 0, 0);
+				drawSprite_screen(screen, 0,      232 + 15, 2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE, 0, 0);
 				
-				drawSprite_screen(screen, 232,      232,      2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE);
-				drawSprite_screen(screen, 232 + 15, 232,      2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE);
-				drawSprite_screen(screen, 232,      232 + 15, 2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE);
+				drawSprite_screen(screen, 232,      232,      2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE, 0, 0);
+				drawSprite_screen(screen, 232 + 15, 232,      2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE, 0, 0);
+				drawSprite_screen(screen, 232,      232 + 15, 2, 2, glyphs_rando, 33, palette_vga, SDL_FALSE, SDL_FALSE, SDL_FALSE, 0, 0);
 
 				blt_screen(screen, scale, &((Uint32*)surface->pixels)[contentOffset], surface->w);
 			}
