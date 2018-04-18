@@ -61,26 +61,6 @@ void setPixelPacked_screen(h_screen screen, Uint8 x, Uint8 y, Uint16 color) {
 		(color & 0x8000 ? SDL_TRUE : SDL_FALSE));
 }
 
-void setPixelRoundTrip_screen(h_screen screen, Uint8 x, Uint8 y, Uint8 r, Uint8 g, Uint8 b, SDL_bool translucent) {
-	setPixelPacked_screen(screen, x, y,
-		(translucent ? 0x8000 : 0x0000) |
-		((r & 0xF8) << 7) |
-		((g & 0xF8) << 2) |
-		((b & 0xF8) >> 3));
-}
-
-void setDemo_screen(h_screen screen) {
-	for (Uint8 y = 0; y < CONTENT_SIZE; y++)
-	{
-		for (Uint8 x = 0; x < CONTENT_SIZE; x++)
-		{
-			setPixelRoundTrip_screen(screen, x, y, x | y, x & y, x ^ y, SDL_FALSE);
-		}
-		setPixelRoundTrip_screen(screen, y / 2, y, 255, 255, 255, SDL_TRUE);
-	}
-
-}
-
 Uint32 packColor(Uint8 r, Uint8 g, Uint8 b) {
 	return (r << 16) | (g << 8) | (b);
 }
@@ -183,84 +163,5 @@ void scanline_screen(h_screen screen, Uint8 y, Uint8 scale, Uint32* dest, Uint32
 void blt_screen(h_screen screen, Uint8 scale, Uint32 *dest, Uint32 stride) {
 	for (Uint8 y = 0; y < CONTENT_SIZE; y++) {
 		scanline_screen(screen, y, scale, &dest[stride * scale * y], stride);
-	}
-}
-
-void drawGlyph_screen(h_screen screen, Sint16 targetX, Sint16 targetY, Uint8* bitPlanes, Uint16* palette, SDL_bool hFlip, SDL_bool vFlip, SDL_bool drawIndexZero, Uint8 hClip, Uint8 vClip) {
-	if (targetX >= CONTENT_SIZE || targetX <= -8) {
-		return;
-	}
-	if (targetY >= CONTENT_SIZE || targetY <= -8) {
-		return;
-	}
-
-	SDL_bool clipBelow = (hClip & 0x80) != 0;
-	hClip <<= 1;
-	SDL_bool clipRight = (vClip & 0x80) != 0;
-	vClip <<= 1;
-
-	for (Uint8 y = 0; y < 8; y++) {
-		if (targetY >= CONTENT_SIZE - y || targetY + y < 0) {
-			continue;
-		}
-		if (clipBelow && targetY + y >= hClip || !clipBelow && targetY + y < hClip) {
-			continue;
-		}
-		Uint8 yOffset = vFlip ? 7 - y : y;
-		Uint16 plane0 = ((Uint16)bitPlanes[yOffset +  0]) << 0;
-		Uint16 plane1 = ((Uint16)bitPlanes[yOffset +  8]) << 1;
-		Uint16 plane2 = ((Uint16)bitPlanes[yOffset + 16]) << 2;
-		Uint16 plane3 = ((Uint16)bitPlanes[yOffset + 24]) << 3;
-		for (Uint8 x = 0; x < 8; x++) {
-			if (targetX >= CONTENT_SIZE - x || targetX + x < 0) {
-				continue;
-			}
-			if (clipRight && targetX + x >= vClip || !clipRight && targetX + x < vClip) {
-				continue;
-			}
-
-			Uint8 xOffset = hFlip ? x : 7 - x;
-			Uint16 mask = 1 << xOffset;
-
-			Uint16 paletteIndex =
-				((plane0 & (mask << 0)) >> (xOffset)) |
-				((plane1 & (mask << 1)) >> (xOffset)) |
-				((plane2 & (mask << 2)) >> (xOffset)) |
-				((plane3 & (mask << 3)) >> (xOffset));
-
-			if (paletteIndex != 0 || drawIndexZero) {
-				setPixelPacked_screen(screen, x + targetX, y + targetY, palette[paletteIndex]);
-			}
-		}
-	}
-}
-
-void drawSprite_screen(h_screen screen, Sint16 targetX, Sint16 targetY, Uint8 sizeX, Uint8 sizeY, Uint8* glyphPage, Uint8 firstGlyphIndex, Uint16* palette, SDL_bool hFlip, SDL_bool vFlip, SDL_bool drawIndexZero, Uint8 hClip, Uint8 vClip) {
-	if (targetX >= CONTENT_SIZE || targetX + 8 * sizeX <= 0) {
-		return;
-	}
-	if (targetY >= CONTENT_SIZE || targetY + 8 * sizeY <= 0) {
-		return;
-	}
-
-	Sint8 shiftX = 8;
-	if (hFlip) {
-		shiftX = -8;
-		targetX += 8 * (sizeX - 1);
-	}
-	Sint8 shiftY = 8;
-	if (vFlip) {
-		shiftY = -8;
-		targetY += 8 * (sizeY - 1);
-	}
-
-	for (Uint8 y = 0; y < sizeY; y++) {
-		Uint8 glyphRow = (firstGlyphIndex + (y << 3)) & 0xF8;
-		for (Uint8 x = 0; x < sizeX; x++) {
-			Uint8 glyphCol = (firstGlyphIndex + x) & 0x07;
-			Uint8 glyphIndex = glyphRow | glyphCol;
-
-			drawGlyph_screen(screen, targetX + shiftX * x, targetY + shiftY * y, &glyphPage[32 * glyphIndex], palette, hFlip, vFlip, drawIndexZero, hClip, vClip);
-		}
 	}
 }
