@@ -38,7 +38,7 @@ void toggleCrtMode_screen(h_screen screen) {
 
 void setPixel_screen(h_screen screen, Uint8 x, Uint8 y, Uint8 r, Uint8 g, Uint8 b, SDL_bool translucent) {
 	SDL_assert(x < CONTENT_SIZE);
-	SDL_assert(x < CONTENT_SIZE);
+	SDL_assert(y < CONTENT_SIZE);
 
 	Uint16 offset = x + y * CONTENT_SIZE;
 	if (translucent) {
