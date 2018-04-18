@@ -6,11 +6,59 @@ typedef struct ppu_def ppu, *h_ppu;
 
 struct ppu_def {
 	Uint8 ram[74752];
+	Uint8 *bgPages[4];
+	Uint8 *spritePages[4];
+	Uint16 *tileMaps[4];
+	Uint16 *bgPalettes[8];
+	Uint16 *spritePalettes[8];
+	Uint8 *spriteControls;
+	Uint8 *spriteX;
+	Uint8 *spriteY;
+	Uint16 *spriteTiles;
+	Uint8 *layerClipX;
+	Uint8 *layerClipY;
+	Uint8 *layerControls;
 };
 
 h_ppu create_ppu() {
 	h_ppu result = (h_ppu)SDL_malloc(sizeof(ppu));
 	SDL_memset(result, 0, 74752);
+	Uint32 offset = 0;
+	for (Uint8 i = 0; i < 4; i++) {
+		result->bgPages[i] = &result->ram[offset];
+		offset += 8 * 1024;
+	}
+	for (Uint8 i = 0; i < 4; i++) {
+		result->spritePages[i] = &result->ram[offset];
+		offset += 8 * 1024;
+	}
+	for (Uint8 i = 0; i < 4; i++) {
+		result->tileMaps[i] = (Uint16*)&result->ram[offset];
+		offset += 2 * 1024;
+	}
+	for (Uint8 i = 0; i < 8; i++) {
+		result->bgPalettes[i] = (Uint16*)&result->ram[offset];
+		offset += 32;
+	}
+	for (Uint8 i = 0; i < 8; i++) {
+		result->bgPalettes[i] = (Uint16*)&result->ram[offset];
+		offset += 32;
+	}
+	result->spriteControls = &result->ram[offset];
+	offset += 100;
+	result->spriteX = &result->ram[offset];
+	offset += 100;
+	result->spriteY = &result->ram[offset];
+	offset += 100;
+	result->spriteTiles = (Uint16*)&result->ram[offset];
+	offset += 200;
+	result->layerClipX = &result->ram[offset];
+	offset += 4;
+	result->layerClipY = &result->ram[offset];
+	offset += 4;
+	result->layerControls = &result->ram[offset];
+	offset += 4;
+	SDL_assert(offset == 74752);
 	return result;
 }
 
