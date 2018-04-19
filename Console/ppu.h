@@ -3,6 +3,15 @@
 #include "SDL.h"
 #include "screen.h"
 
+#define SPRITE_SIZE_1x1 0
+#define SPRITE_SIZE_2x2 1
+#define SPRITE_SIZE_4x4 2
+#define SPRITE_SIZE_8x8 3
+#define SPRITE_SIZE_1x2 4
+#define SPRITE_SIZE_2x1 5
+#define SPRITE_SIZE_2x4 6
+#define SPRITE_SIZE_4x2 7
+
 typedef struct ppu_def *h_ppu;
 h_ppu create_ppu();
 void destroy_ppu(h_ppu ppu);
@@ -40,8 +49,7 @@ void setSpriteTile_ppu(h_ppu ppu, Uint8 spriteIndex,
 
 void setSpriteControl_ppu(h_ppu ppu, Uint8 spriteIndex,
 	SDL_bool enabled,
-	Uint8 xOffset, SDL_bool negateXOffset,
-	Uint8 yOffset, SDL_bool negateYOffset,
+	Sint16 xOffset, Sint16 yOffset,
 	Uint8 layer, Uint8 size);
 
 #endif

@@ -41,7 +41,7 @@ h_ppu create_ppu() {
 		offset += 32;
 	}
 	for (Uint8 i = 0; i < 8; i++) {
-		result->bgPalettes[i] = (Uint16*)&result->ram[offset];
+		result->spritePalettes[i] = (Uint16*)&result->ram[offset];
 		offset += 32;
 	}
 	result->spriteControls = &result->ram[offset];
@@ -194,6 +194,87 @@ void renderLayerTiles(h_ppu ppu, Uint8 layerIndex, Uint8 offsetX, Uint8 offsetY,
 	}
 }
 
+SDL_bool spriteEnabled(Uint8 spriteControl) {
+	return (spriteControl & 0x80) == 0x80;
+}
+
+SDL_bool negateXOffset(Uint8 spriteControl) {
+	return (spriteControl & 0x40) == 0x40;
+}
+
+SDL_bool negateYOffset(Uint8 spriteControl) {
+	return (spriteControl & 0x20) == 0x20;
+}
+
+Uint8 sizeX(Uint8 spriteControl) {
+	Uint8 size = (spriteControl & 0x1C) >> 2;
+	switch (size) {
+	case SPRITE_SIZE_1x1:
+	case SPRITE_SIZE_1x2:
+		return 1;
+	case SPRITE_SIZE_2x1:
+	case SPRITE_SIZE_2x2:
+	case SPRITE_SIZE_2x4:
+		return 2;
+	case SPRITE_SIZE_4x2:
+	case SPRITE_SIZE_4x4:
+		return 4;
+	case SPRITE_SIZE_8x8:
+	default:
+		return 8;
+	}
+}
+
+Uint8 sizeY(Uint8 spriteControl) {
+	Uint8 size = (spriteControl & 0x1C) >> 2;
+	switch (size) {
+	case SPRITE_SIZE_1x1:
+	case SPRITE_SIZE_2x1:
+		return 1;
+	case SPRITE_SIZE_1x2:
+	case SPRITE_SIZE_2x2:
+	case SPRITE_SIZE_4x2:
+		return 2;
+	case SPRITE_SIZE_2x4:
+	case SPRITE_SIZE_4x4:
+		return 4;
+	case SPRITE_SIZE_8x8:
+	default:
+		return 8;
+	}
+}
+
+
+Uint8 packSpriteControl(SDL_bool enabled, SDL_bool negateXOffset, SDL_bool negateYOffset, Uint8 size, Uint8 layer) {
+	SDL_assert(size < 8);
+	SDL_assert(layer < 4);
+	return (enabled ? 0x80 : 0x00)
+		| (negateXOffset ? 0x40 : 0x00)
+		| (negateYOffset ? 0x20 : 0x00)
+		| (size << 2)
+		| layer;
+}
+
+void renderLayerSprite(h_ppu ppu, Sint16 targetX, Sint16 targetY, Uint8 sizeX, Uint8 sizeY, Uint16 spriteTile, Uint8 hClip, Uint8 vClip, h_screen screen) {
+	renderSprite(screen, targetX, targetY, sizeX, sizeY, ppu->spritePages[pageIndex(spriteTile)], glyphIndex(spriteTile), ppu->spritePalettes[paletteIndex(spriteTile)], hFlip(spriteTile), vFlip(spriteTile), drawIndexZero(spriteTile), hClip, vClip);
+}
+
+void renderLayerSprites(h_ppu ppu, Uint8 layerIndex, Uint8 hClip, Uint8 vClip, h_screen screen) {
+	for (int i = 0; i < 100; i++) {
+		Uint8 spriteControl = ppu->spriteControls[i];
+		if (!spriteEnabled(spriteControl)) {
+			continue;
+		}
+		renderLayerSprite(ppu,
+			ppu->spriteX[i] * (negateXOffset(spriteControl) ? -1 : 1),
+			ppu->spriteY[i] * (negateYOffset(spriteControl) ? -1 : 1),
+			sizeX(spriteControl),
+			sizeY(spriteControl),
+			ppu->spriteTiles[i],
+			hClip, vClip, screen);
+	}
+}
+
 SDL_bool layerEnabled(Uint8 layerControl) {
 	return (layerControl & 0x80) == 0x80;
 }
@@ -228,11 +309,11 @@ void renderLayer(h_ppu ppu, Uint8 layerIndex, h_screen screen) {
 		return;
 	}
 
-	if (drawSpritesFirst(layerControl)) {
+	if (!drawSpritesFirst(layerControl)) {
 		renderLayerTiles(ppu, layerIndex, layerXOffset(layerControl), layerYOffset(layerControl), layerHClip, layerVClip, screen);
 	}
-	// TODO: draw sprites
-	if (!drawSpritesFirst(layerControl)) {
+	renderLayerSprites(ppu, layerIndex, layerHClip, layerVClip, screen);
+	if (drawSpritesFirst(layerControl)) {
 		renderLayerTiles(ppu, layerIndex, layerXOffset(layerControl), layerYOffset(layerControl), layerHClip, layerVClip, screen);
 	}
 }
@@ -296,9 +377,16 @@ void setBackgroundPage_ppu(h_ppu ppu, Uint8 pageIndex, Uint8 *data) {
 	SDL_memcpy(ppu->bgPages[pageIndex], data, 8192);
 }
 
+void setSpritePage_ppu(h_ppu ppu, Uint8 pageIndex, Uint8 *data) {
+	SDL_memcpy(ppu->spritePages[pageIndex], data, 8192);
+}
 
 void setBackgroundPalette_ppu(h_ppu ppu, Uint8 paletteIndex, Uint16 *data) {
 	SDL_memcpy(ppu->bgPalettes[paletteIndex], data, 32);
+}
+
+void setSpritePalette_ppu(h_ppu ppu, Uint8 paletteIndex, Uint16 *data) {
+	SDL_memcpy(ppu->spritePalettes[paletteIndex], data, 32);
 }
 
 void setBackgroundTile_ppu(h_ppu ppu, Uint8 layerIndex, Uint8 x, Uint8 y,
@@ -306,4 +394,36 @@ void setBackgroundTile_ppu(h_ppu ppu, Uint8 layerIndex, Uint8 x, Uint8 y,
 		SDL_bool hFlip, SDL_bool vFlip,
 		Uint8 paletteIndex, SDL_bool drawColorZero) {
 	ppu->tileMaps[layerIndex][x + 32 * y] = packTile(drawColorZero, hFlip, vFlip, paletteIndex, pageIndex, glyphIndex);
+}
+
+void setSpriteControl_ppu(h_ppu ppu, Uint8 spriteIndex,
+		SDL_bool enabled,
+		Sint16 xOffset, Sint16 yOffset,
+		Uint8 layer, Uint8 size) {
+	SDL_assert(xOffset >= -255 && xOffset <= 255);
+	SDL_assert(yOffset >= -255 && yOffset <= 255);
+
+	SDL_bool negateXOffset = SDL_FALSE;
+	if (xOffset < 0) {
+		xOffset = -xOffset;
+		negateXOffset = SDL_TRUE;
+	}
+
+	SDL_bool negateYOffset = SDL_FALSE;
+	if (yOffset < 0) {
+		yOffset = -yOffset;
+		negateYOffset = SDL_TRUE;
+	}
+
+	ppu->spriteX[spriteIndex] = (Uint8)xOffset;
+	ppu->spriteY[spriteIndex] = (Uint8)yOffset;
+
+	ppu->spriteControls[spriteIndex] = packSpriteControl(enabled, negateXOffset, negateYOffset, size, layer);
+}
+
+void setSpriteTile_ppu(h_ppu ppu, Uint8 spriteIndex,
+		Uint8 pageIndex, Uint8 glyphIndex,
+		SDL_bool hFlip, SDL_bool vFlip,
+		Uint8 paletteIndex, SDL_bool drawColorZero) {
+	ppu->spriteTiles[spriteIndex] = packTile(drawColorZero, hFlip, vFlip, paletteIndex, pageIndex, glyphIndex);
 }

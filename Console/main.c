@@ -37,6 +37,15 @@ void Draw(h_screen screen, SDL_Window* window) {
 					}
 				}
 
+				setSpritePage_ppu(ppu, 0, glyphs_rando);
+				setSpritePalette_ppu(ppu, 0, palette_vga);
+
+				setSpriteTile_ppu(ppu, 0, 0, 184, SDL_FALSE, SDL_FALSE, 0, SDL_FALSE);
+				setSpriteControl_ppu(ppu, 0, SDL_TRUE, 25, -3, 0, SPRITE_SIZE_8x8);
+
+				setSpriteTile_ppu(ppu, 1, 0, 152, SDL_FALSE, SDL_FALSE, 0, SDL_FALSE);
+				setSpriteControl_ppu(ppu, 1, SDL_TRUE, 77, 125, 0, SPRITE_SIZE_4x4);
+
 				render_ppu(ppu, screen);
 				destroy_ppu(ppu);
 
